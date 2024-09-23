@@ -1,0 +1,2 @@
+1. pip install requirements.txt
+2. run flask: python app.py

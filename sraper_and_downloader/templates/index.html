@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artstation Scraper</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" href="/static/img_3_3.png">
+    <style>
+        /* Стилі для тіла */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            color: #1ba3ff;
+
+        }
+
+        /* Стиль для фону */
+        .background-blur {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('/static/img.png'); /* Твій шлях до зображення */
+            background-size: cover;
+            background-position: center;
+            filter: blur(10px); /* Розмиття */
+            z-index: -1; /* Фонове зображення позаду контенту */
+        }
+
+        /* Контейнер для контенту */
+        .container-content {
+            position: relative;
+            z-index: 1; /* Важливо, щоб контент був поверх фону */
+            background-color: rgba(17, 15, 21, 0.85); /* Напівпрозорий чорний фон */
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 5rem; /* Відступ зверху */
+        }
+
+        .btn-primary {
+            background-color: #50b3ff;
+            border-color: #50b3ff;
+        }
+
+        .btn-primary:hover {
+            background-color: #4091d0;
+            border-color: #4091d0;
+        }
+
+        .border-gray {
+            border-color: #808080;
+        }
+
+        .link-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .image-list img {
+            max-width: 100px;
+            height: auto;
+            border: 1px solid #808080;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Фоновий div із розмиттям -->
+<div class="background-blur"></div>
+<!-- nav -->
+<nav class="navbar bg-dark  border-body" data-bs-theme="dark">
+  <div class="container-fluid ">
+    <a class="navbar-brand "  href="/">
+      <img src="/static/img_3_3.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
+      Artstation Scraper
+    </a>
+  </div>
+</nav>
+<!-- Контейнер із контентом -->
+<div class="container mt-5 container-content">
+
+    <!-- <h1 class="text-center">Artstation Scraper</h1> -->
+
+    <!-- Повідомлення для користувача про очікування -->
+    <div id="loading-message" class="alert alert-info" style="display: none;">Please wait, work in progress...</div>
+    <div id="success-message" class="alert alert-success" style="display: none;">Images downloading in progress...</div>
+    <!-- Done повідомлення для сторінки /download -->
+    {% if download_complete %}
+    <div id="done-message" class="alert alert-success">Done!!!</div>
+    {% endif %}
+    <!-- Форма для введення URL і імені художника -->
+    <form method="POST" action="/scrape" class="mb-4 ">
+        <div class="mb-3">
+            <label for="url" class="form-label">Enter ArtStation URL:</label>
+            <input type="text" name="url" id="url" class="form-control" placeholder="URL" required>
+        </div>
+        <div class="mb-3">
+            <label for="artist_name" class="form-label">Artist Name:</label>
+            <input type="text" name="artist_name" id="artist_name" class="form-control" placeholder="Name" required>
+        </div>
+        <button type="submit" class="btn btn-primary mt-4">Scrape Links</button>
+    </form>
+    <form method="POST" action="/download" class="mb-4">
+        <input type="hidden" name="artist_name" value="{{ request.form['artist_name'] }}">
+        <button type="submit" class="btn btn-primary mt-4">Download Images</button>
+    </form>
+
+
+    <hr>
+
+    <!-- Список зібраних посилань -->
+    <div class="row">
+        <div class="col-md-4 border-gray link-list">
+            <h3>Scraped Links</h3>
+            <ul class="list-group list-group-flush ">
+                {% for link in links %}
+                <li class="list-group-item bg-transparent">
+                    <a href="{{ link }}" target="_blank">{{ link.split("/")[-1].split(".")[0] }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Список завантажених зображень з посиланнями -->
+        <div class="col-md-8 border-gray image-list">
+            <h3>Download Images</h3>
+            <div class="d-flex flex-wrap">
+                {% for img in images %}
+                <div class="d-flex align-items-center mb-3">
+                    <img src="{{ img }}" class="rounded img-fluid" alt="Artwork Image">
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Скрипт для відображення повідомлень -->
+<script>
+    document.querySelector('form[action="/scrape"]').addEventListener('submit', function() {
+        document.getElementById('loading-message').style.display = 'block';
+        document.getElementById('success-message').style.display = 'none';
+    });
+
+    document.querySelector('form[action="/download"]').addEventListener('submit', function() {
+        document.getElementById('success-message').style.display = 'block';
+        document.getElementById('loading-message').style.display = 'none';
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+<!--
+-->
