@@ -8,11 +8,11 @@ from selenium.webdriver.chrome.options import Options
 from concurrent.futures import as_completed
 
 
-# Функція для завантаження списку проектів (посилання на окремі роботи)
+# Function to download the list of projects (links to individual works)
 def get_artwork_list(url):
     print("get_artwork_list - START")
 
-    # Ініціалізація драйвера
+    # Initialize the driver
     options = Options()
     options.add_argument("--window-size=0,0")
 
@@ -20,12 +20,12 @@ def get_artwork_list(url):
     driver.minimize_window()
     driver.get(url)
 
-    # Скролінг для завантаження контенту
+    # Scrolling to load content
     SCROLL_PAUSE_TIME = 2
     last_height = driver.execute_script("return document.body.scrollHeight")
 
     while True:
-        # Скролимо сторінку донизу
+        # Scroll down the page
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(SCROLL_PAUSE_TIME)
         new_height = driver.execute_script("return document.body.scrollHeight")
@@ -33,10 +33,10 @@ def get_artwork_list(url):
             break
         last_height = new_height
 
-    # Парсинг сторінки після скролінгу
+    # Parsing the page after scrolling
     soup = BeautifulSoup(driver.page_source, 'html.parser')
 
-    # Знаходимо всі посилання на окремі роботи (наприклад, https://www.artstation.com/artwork/RKy3RE)
+    # Finding all links to individual works (e.g., https://www.artstation.com/artwork/LAkmk)
     for_links = soup.find_all("a", href=True)
     links = []
 
@@ -46,17 +46,17 @@ def get_artwork_list(url):
             full_link = href
             links.append(full_link)
 
-    driver.quit()  # Закриваємо драйвер
+    driver.quit()  # Close the driver
     print("get_artwork_list - OK")
 
-    # Виводимо знайдені посилання
+    # Output the found links
     for l in links:
         print(l)
 
     return links
 
 
-# Функція для отримання посилань на зображення з одного проекту
+# Function to get image links from a single project
 def process_single_artwork(link, name_of_artist, index, total_artworks):
     print(f'Processing artwork {index}/{total_artworks}: {link}')
 
@@ -65,22 +65,22 @@ def process_single_artwork(link, name_of_artist, index, total_artworks):
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     driver.minimize_window()
     driver.get(link)
-    time.sleep(1)  # Мінімізуємо час очікування
+    time.sleep(1)  # Minimize wait time
 
-    # Парсимо сторінку проекту
+    # Parsing the project page
     soup = BeautifulSoup(driver.page_source, 'html.parser')
-    driver.quit()  # Закриваємо драйвер після отримання сторінки
+    driver.quit()  # Close the driver after fetching the page
 
-    # Знаходимо всі теги <picture> із зображеннями
+    # Finding all <picture> tags with images
     for_img_links = soup.find_all("picture", {"class": "d-flex"})
     print(f'Found {len(for_img_links)} images in artwork {index}')
 
-    # Збираємо посилання на зображення у список
+    # Collecting image links into a list
     img_links_for_app = []
     for picture_tag in for_img_links:
         img_tag = picture_tag.find('img')
         if img_tag:
-            img_url = img_tag.get('src')  # Беремо посилання з атрибуту src
+            img_url = img_tag.get('src')  # Get the link from the src attribute
             img_links_for_app.append(img_url)
 
     with open(f'{name_of_artist}_links_of_img.txt', 'a') as file:
@@ -88,43 +88,43 @@ def process_single_artwork(link, name_of_artist, index, total_artworks):
         for i, picture_tag in enumerate(for_img_links, start=1):
             img_tag = picture_tag.find('img')
             if img_tag:
-                img_url = img_tag.get('src')  # Беремо посилання з атрибуту src
+                img_url = img_tag.get('src')  # Get the link from the src attribute
                 file.write(f'- {i}. {img_url}\n')
                 print(img_url)
     file.close()
 
-    return img_links_for_app  # Повертаємо список посилань на зображення
+    return img_links_for_app  # Return the list of image links
 
 
-# Функція для отримання посилань на зображення з усіх проектів за допомогою багатопоточності
+# Function to get image links from all projects using multithreading
 def get_artwork_img_links_to_file_from_artwork_list(artwork_list, name_of_artist):
     print("get_artwork_img_links_to_file_from_artwork_list - START")
 
     total_artworks = len(artwork_list)
-    results_list = []  # Список для зберігання результатів
+    results_list = []  # List to store results
 
-    # Використовуємо ThreadPoolExecutor для багатопоточної обробки
+    # Use ThreadPoolExecutor for multithreaded processing
     with ThreadPoolExecutor(max_workers=5) as executor:
         futures = []
-        # Запускаємо обробку кожного проекту паралельно
+        # Start processing each project in parallel
         for index, link in enumerate(artwork_list, start=1):
             future = executor.submit(process_single_artwork, link, name_of_artist, index, total_artworks)
             futures.append(future)
 
-        # Чекаємо завершення всіх завдань
+        # Wait for all tasks to complete
         for future in as_completed(futures):
             results = future.result()
-            if results:  # Якщо є результати, додаємо до загального списку
+            if results:   # If there are results, add to the overall list
                 results_list.extend(results)
 
     print("get_artwork_img_links_to_file_from_artwork_list - OK")
-    return results_list  # Повертаємо список всіх зображень
+    return results_list  # Return the list of all images
 
-# Основний блок програми
+# For test
 if __name__ == '__main__':
     name_of_artist = "test_name"
-    # Отримуємо список посилань на роботи
+    # Get the list of links to works
     links = get_artwork_list('https://www.artstation.com/test_name')
 
-    # Отримуємо посилання на зображення з кожної роботи з багатопоточною обробкою
+    # Get image links from each work with multithreading
     get_artwork_img_links_to_file_from_artwork_list(links, name_of_artist)

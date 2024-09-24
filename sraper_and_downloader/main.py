@@ -1,5 +1,10 @@
 import downloader
 import scraper
+
+# Only for test <-------------
+# Only for test <-------------
+# Only for test <-------------
+
 if __name__ == '__main__':
     name_of_artist = "angrysnail"
     url = 'https://www.artstation.com/angrysnail'

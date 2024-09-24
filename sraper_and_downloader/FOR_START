@@ -1,2 +1,8 @@
-1. pip install requirements.txt
+
+0. install python: https://www.python.org/downloads/
+
+1. install requirements: pip install requirements.txt
+
 2. run flask: python app.py
+
+3. If this doesn't work, then it's your problem, and maybe a bit my fault as well...

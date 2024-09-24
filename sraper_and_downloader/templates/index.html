@@ -7,7 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="icon" href="/static/img_3_3.png">
     <style>
-        /* Стилі для тіла */
+        /* Styles for body */
         body, html {
             margin: 0;
             padding: 0;
@@ -16,28 +16,28 @@
 
         }
 
-        /* Стиль для фону */
+        /* Background style */
         .background-blur {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('/static/img.png'); /* Твій шлях до зображення */
+            background-image: url('/static/img.png'); /* Your path to the image */
             background-size: cover;
             background-position: center;
-            filter: blur(10px); /* Розмиття */
-            z-index: -1; /* Фонове зображення позаду контенту */
+            filter: blur(10px); /* Blur effect */
+            z-index: -1; /* Background image behind the content */
         }
 
-        /* Контейнер для контенту */
+        /* Container for content */
         .container-content {
             position: relative;
-            z-index: 1; /* Важливо, щоб контент був поверх фону */
-            background-color: rgba(17, 15, 21, 0.85); /* Напівпрозорий чорний фон */
+            z-index: 1; /* For content to be above the background */
+            background-color: rgba(17, 15, 21, 0.85); /* Semi-transparent black background */
             padding: 20px;
             border-radius: 10px;
-            margin-top: 5rem; /* Відступ зверху */
+            margin-top: 5rem; /* Top margin */
         }
 
         .btn-primary {
@@ -69,7 +69,7 @@
 </head>
 <body>
 
-<!-- Фоновий div із розмиттям -->
+<!-- Background div with blur -->
 <div class="background-blur"></div>
 <!-- nav -->
 <nav class="navbar bg-dark  border-body" data-bs-theme="dark">
@@ -80,19 +80,19 @@
     </a>
   </div>
 </nav>
-<!-- Контейнер із контентом -->
+<!-- Content container -->
 <div class="container mt-5 container-content">
 
     <!-- <h1 class="text-center">Artstation Scraper</h1> -->
 
-    <!-- Повідомлення для користувача про очікування -->
+    <!-- Message for the user about waiting -->
     <div id="loading-message" class="alert alert-info" style="display: none;">Please wait, work in progress...</div>
     <div id="success-message" class="alert alert-success" style="display: none;">Images downloading in progress...</div>
-    <!-- Done повідомлення для сторінки /download -->
+    <!-- Done message for /download page -->
     {% if download_complete %}
     <div id="done-message" class="alert alert-success">Done!!!</div>
     {% endif %}
-    <!-- Форма для введення URL і імені художника -->
+     <!-- Form for entering URL and artist name -->
     <form method="POST" action="/scrape" class="mb-4 ">
         <div class="mb-3">
             <label for="url" class="form-label">Enter ArtStation URL:</label>
@@ -112,7 +112,7 @@
 
     <hr>
 
-    <!-- Список зібраних посилань -->
+    <!-- List of collected links -->
     <div class="row">
         <div class="col-md-4 border-gray link-list">
             <h3>Scraped Links</h3>
@@ -125,7 +125,7 @@
             </ul>
         </div>
 
-        <!-- Список завантажених зображень з посиланнями -->
+        <!-- List of downloaded images with links -->
         <div class="col-md-8 border-gray image-list">
             <h3>Download Images</h3>
             <div class="d-flex flex-wrap">
@@ -139,7 +139,7 @@
     </div>
 </div>
 
-<!-- Скрипт для відображення повідомлень -->
+<!-- Script for displaying messages -->
 <script>
     document.querySelector('form[action="/scrape"]').addEventListener('submit', function() {
         document.getElementById('loading-message').style.display = 'block';

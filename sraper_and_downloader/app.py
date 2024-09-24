@@ -5,7 +5,7 @@ import os
 
 app = Flask(__name__)
 
-# Шлях для збереження завантажених зображень
+# Path for saving downloaded images
 DOWNLOAD_FOLDER = 'static/downloads'
 os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
 
@@ -20,13 +20,13 @@ def scrape():
     url = request.form['url']
     name_of_artist = request.form['artist_name']
 
-    # Отримання списку посилань на роботи
+    # Fetch the list of artwork links
     links = scraper.get_artwork_list(url)
 
-    # Отримання посилань на зображення з кожної роботи
+    # Get image links from each artwork
     img_links = scraper.get_artwork_img_links_to_file_from_artwork_list(links, name_of_artist)
 
-    # Відображення посилань на сторінці
+    # Display the links on the page
     return render_template('index.html', links=img_links, images=img_links)
 
 
@@ -34,17 +34,17 @@ def scrape():
 def download_image():
     name_of_artist = request.form['artist_name']
     print(name_of_artist)
-    # Запускаємо завантажувач
+    # Start the downloader
     downloader.downloader_img_of_links_from_file(name_of_artist)
 
-    # Шлях до папки зображень конкретного артиста
+    # Path to the artist's image folder
     artist_folder = os.path.join(DOWNLOAD_FOLDER, name_of_artist)
 
-    # Перевірка, чи папка існує
+    # Check if the folder exists
     if not os.path.exists(artist_folder):
         return render_template('index.html', links=[], images=[], download_complete=False)
 
-    # Отримання списку завантажених зображень
+    # Get the list of downloaded images
     images = [f"/static/downloads/{name_of_artist}/{file}" for file in os.listdir(artist_folder) if
               file.endswith(('.png', '.jpg', '.jpeg'))]
     return render_template('index.html', links=[], images=images, download_complete=True)
